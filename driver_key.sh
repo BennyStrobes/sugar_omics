@@ -49,4 +49,36 @@ results_dir=${working_directory}"results/"
 
 ############################
 # Clean and process input data
+if false; then
 sh process_input_data.sh $sample_structure_input_file $protein_input_file $phosphosite_input_file $processed_input_data_dir
+fi
+
+
+
+
+############################
+# Run differential expression analysis
+
+# Parameters to iterate over
+tissue_versions=( "sq" "om")
+omics_versions=("protein" "phosphosite")
+test_versions=("fructose_glucose" "steotosis_non_steotosis" "1_2" "3_4" "1_3" "2_4" "FFA")
+
+
+
+
+tissue_version="sq"
+omic_version="protein"
+test_version="fructose_glucose"
+
+# Input data
+sample_structure_file=${processed_input_data_dir}"sample_structure_"${tissue_version}".txt"
+omic_data_file=${processed_input_data_dir}${omic_version}"_log2_"${tissue_version}".txt"
+# Analysis output root
+analysis_output_root=${results_dir}${test_version}"_test_"${tissue_version}"_tissue_"${omic_version}"_omics"
+
+sh run_differential_omics_analysis.sh ${test_version} ${sample_structure_file} ${omic_data_file} ${analysis_output_root}
+
+
+
+

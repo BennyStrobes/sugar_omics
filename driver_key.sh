@@ -49,5 +49,4 @@ results_dir=${working_directory}"results/"
 
 ############################
 # Clean and process input data
-
 sh process_input_data.sh $sample_structure_input_file $protein_input_file $phosphosite_input_file $processed_input_data_dir

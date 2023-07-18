@@ -3,6 +3,7 @@ import os
 import sys
 import pdb
 import statsmodels.api as sm
+import scipy.stats
 
 def run_association_test(feature_vector, omics_values):
 	# Fix nan values
@@ -22,13 +23,35 @@ def run_association_test(feature_vector, omics_values):
 
 	return beta, beta_se, pvalue
 
+def run_rank_based_association_test(feature_vector, omics_values):
+	# Fix nan values
+	if np.sum(np.isnan(feature_vector)):
+		valid_indices = np.isnan(feature_vector) == False
+		feature_vector = feature_vector[valid_indices]
+		omics_values = omics_values[valid_indices]
+
+	# Feature vector is binary
+	if np.array_equal(np.sort(np.unique(feature_vector)), np.asarray([0.0,1.0])):
+		res = scipy.stats.ranksums(omics_values[feature_vector==0.0], omics_values[feature_vector==1.0])
+		beta = res.statistic
+		beta_se = np.nan
+		pvalue = res.pvalue
+	else:
+		res = scipy.stats.spearmanr(omics_values, feature_vector)
+		beta = res.statistic
+		beta_se = np.nan
+		pvalue = res.pvalue
+
+	return beta, beta_se, pvalue
+
 
 ##########################
 # Command line arguements
 ##########################
 feature_vector_file = sys.argv[1]
 omic_data_file = sys.argv[2]
-output_file = sys.argv[3]
+statistical_test = sys.argv[3]
+output_file = sys.argv[4]
 
 # Load in feature vector
 feature_vector = np.loadtxt(feature_vector_file)
@@ -58,8 +81,11 @@ for line in f:
 		pdb.set_trace()
 
 
-	# Run association test
-	beta, beta_se, pvalue = run_association_test(feature_vector, omics_values)
+	if statistical_test == 'linear_regression':
+		# Run association test
+		beta, beta_se, pvalue = run_association_test(feature_vector, omics_values)
+	elif statistical_test == 'rank_based':
+		beta, beta_se, pvalue = run_rank_based_association_test(feature_vector, omics_values)
 
 	# Print results to output file
 	t.write(test_name + '\t' + str(beta) + '\t' + str(beta_se) + '\t' + str(pvalue) + '\n')

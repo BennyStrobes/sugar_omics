@@ -65,20 +65,20 @@ omics_versions=("protein" "phosphosite")
 test_versions=("fructose_glucose" "steotosis_non_steotosis" "1_2" "3_4" "1_3" "2_4" "FFA")
 
 
+for tissue_version in "${tissue_versions[@]}"; do
+for omic_version in "${omics_versions[@]}"; do
+for test_version in "${test_versions[@]}"; do
 
+	# Input data
+	sample_structure_file=${processed_input_data_dir}"sample_structure_"${tissue_version}".txt"
+	omic_data_file=${processed_input_data_dir}${omic_version}"_log2_"${tissue_version}".txt"
+	# Analysis output root
+	analysis_output_root=${results_dir}${test_version}"_test_"${tissue_version}"_tissue_"${omic_version}"_omics"
 
-tissue_version="sq"
-omic_version="protein"
-test_version="fructose_glucose"
+	sh run_differential_omics_analysis.sh ${test_version} ${sample_structure_file} ${omic_data_file} ${analysis_output_root}
 
-# Input data
-sample_structure_file=${processed_input_data_dir}"sample_structure_"${tissue_version}".txt"
-omic_data_file=${processed_input_data_dir}${omic_version}"_log2_"${tissue_version}".txt"
-# Analysis output root
-analysis_output_root=${results_dir}${test_version}"_test_"${tissue_version}"_tissue_"${omic_version}"_omics"
-
-sh run_differential_omics_analysis.sh ${test_version} ${sample_structure_file} ${omic_data_file} ${analysis_output_root}
-
-
+done
+done
+done
 
 
